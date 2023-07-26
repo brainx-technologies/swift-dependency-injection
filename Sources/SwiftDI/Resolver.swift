@@ -14,7 +14,7 @@ public class Resolver {
         var tag: String?
     }
 
-    static let `default` = Resolver()
+    public static let `default` = Resolver()
 
     private var registeries = [Key: Storable]()
 

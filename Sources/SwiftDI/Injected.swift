@@ -8,11 +8,11 @@
 import Foundation
 
 @propertyWrapper
-class Injected<T> {
+public class Injected<T> {
 
-    var wrappedValue: T
+    public var wrappedValue: T
 
-    init(resolver: Resolver = .default, tag: String? = nil) {
+    public init(resolver: Resolver = .default, tag: String? = nil) {
         guard let value = resolver.resolve(type: T.self, tag: tag) else {
             fatalError("Unable to resolve type \(String(describing: T.self))")
         }
