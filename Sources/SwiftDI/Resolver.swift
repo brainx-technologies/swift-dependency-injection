@@ -17,14 +17,20 @@ public class Resolver {
     public static let `default` = Resolver()
 
     private var registeries = [Key: Storable]()
+    private var cache = [Key: Storable]()
 
     /// Register a dependency
-    public func register<T>(type: T.Type, tag: String? = nil, factory: @escaping () -> T) {
+    public func register<T>(
+        type: T.Type,
+        tag: String? = nil,
+        singleton: Bool = false,
+        factory: @escaping () -> T
+    ) {
         let key = Key(
             identifier: ObjectIdentifier(type),
             tag: tag
         )
-        let container = Container(factory: factory)
+        let container = Container(factory: factory, singleInstance: singleton)
         registeries[key] = container
     }
 
@@ -39,7 +45,18 @@ public class Resolver {
             return nil
         }
 
-        return container.factory()
+        guard container.singleInstance else {
+            return container.factory()
+        }
+
+        if let cachedContainer = cache[key] as? SingletonContainer<T> {
+            return cachedContainer.instance
+        }
+
+        let instance = container.factory()
+        cache[key] = SingletonContainer(instance: instance)
+
+        return instance
     }
 
     /// Unregister a depenendency
