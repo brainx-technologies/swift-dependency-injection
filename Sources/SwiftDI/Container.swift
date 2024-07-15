@@ -17,8 +17,10 @@ class Container<T>: Storable {
 
     let identifier: UUID = UUID()
     var factory: () -> T
+    var singleInstance: Bool
 
-    init(factory: @escaping () -> T) {
+    init(factory: @escaping () -> T, singleInstance: Bool) {
         self.factory = factory
+        self.singleInstance = singleInstance
     }
 }

@@ -8,11 +8,11 @@
 import Foundation
 
 @propertyWrapper
-class OptionalInjected<T> {
+public class OptionalInjected<T> {
 
-    var wrappedValue: T?
+    public var wrappedValue: T?
 
-    init(resolver: Resolver = .default, tag: String? = nil) {
+    public init(resolver: Resolver = .default, tag: String? = nil) {
         wrappedValue = resolver.resolve(type: T.self, tag: tag)
     }
 
