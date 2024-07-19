@@ -19,6 +19,9 @@ public class Resolver {
     private var registeries = [Key: Storable]()
     private var cache = [Key: Storable]()
 
+    public init() {
+    }
+
     /// Register a dependency
     public func register<T>(
         type: T.Type,
