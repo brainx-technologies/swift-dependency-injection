@@ -27,7 +27,7 @@ public class ScopedResolver {
             hasher.combine(identifier)
         }
 
-        public func createWithIn<T>(_ execute: () -> T) -> T {
+        public func createWithin<T>(_ execute: () -> T) -> T {
             stack.push(self)
             defer {
                 stack.pop()

@@ -22,7 +22,15 @@ public class Resolver {
     public init() {
     }
 
-    /// Register a dependency
+    public func register<T>(
+        type: T.Type,
+        singleton: Bool = false,
+        factory: @escaping () -> T
+    ) {
+        register(type: type, tag: nil, singleton: singleton, factory: factory)
+    }
+
+    @available(*, deprecated, message: "Use ScopedResolver for context-based resolution instead of tag")
     public func register<T>(
         type: T.Type,
         tag: String? = nil,
@@ -38,6 +46,11 @@ public class Resolver {
     }
 
     /// Resolves a dependency
+    public func resolve<T>(type: T.Type) -> T?  {
+        resolve(type: type, tag: nil)
+    }
+
+    @available(*, deprecated, message: "Use ScopedResolver for context-based resolution instead of tag")
     public func resolve<T>(type: T.Type, tag: String? = nil) -> T? {
         let key = Key(
             identifier: ObjectIdentifier(type),
@@ -63,6 +76,12 @@ public class Resolver {
     }
 
     /// Unregister a depenendency
+    public func unregister<T>(type: T.Type) {
+        unregister(type: type, tag: nil)
+    }
+
+
+    @available(*, deprecated, message: "Use ScopedResolver for context-based resolution instead of tag")
     public func unregister<T>(type: T.Type, tag: String? = nil) {
         let key = Key(
             identifier: ObjectIdentifier(type),
