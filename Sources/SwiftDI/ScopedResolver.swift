@@ -62,7 +62,7 @@ public class ScopedResolver {
         }
     }
 
-    static let `default` = ScopedResolver()
+    static public let `default` = ScopedResolver()
 
     private var registeries = [Key: Storable]()
     private var cache = [Key: Storable]()
@@ -88,7 +88,7 @@ public class ScopedResolver {
         return resolve(type: type, from: scope)
     }
 
-    public func createScope(with identifier: String) -> Scope {
+    public func createScope(with identifier: String = UUID().uuidString) -> Scope {
         Scope(identifier: identifier, stack: scopeStack)
     }
 
