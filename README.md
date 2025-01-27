@@ -14,7 +14,6 @@ You can install SwiftDI using Swift Package Manager. Add the following line to y
 To register a dependency, you need to specify its type and a factory closure that produces instances of that type. The `Resolver` class is responsible for registering and resolving dependencies.
 
 ```swift
-
 protocol UserRepository {
     // protocol requirements
 }
@@ -29,7 +28,10 @@ Resolver.default.register(
 )
 ```
 
-If you want to register multiple dependencies of the same type, you can use a tag to differentiate between them
+If you want to register multiple dependencies of the same type, you can either use tags or scopes.
+
+#### Using Tags
+Tags allow you to differentiate between multiple implementations of the same type:
 
 ```swift 
 Resolver.default.register(
@@ -43,8 +45,37 @@ Resolver.default.register(
     factory: { DefaultUserRepository() }
 )
 ```
+
+#### Using Scopes
+Scopes provide a more powerful way to manage different instances of dependencies based on context. This is particularly useful when you need different instances in different parts of your application:
+
+```swift
+// Create scopes
+let mainScope = ScopedResolver.default.createScope(with: "main")
+let featureScope = ScopedResolver.default.createScope(with: "feature")
+
+// Register dependencies in different scopes
+ScopedResolver.default.register(
+    type: UserRepository.self,
+    in: mainScope,
+    factory: { DefaultUserRepository() }
+)
+
+ScopedResolver.default.register(
+    type: UserRepository.self,
+    in: featureScope,
+    factory: { FeatureUserRepository() }
+)
+
+// Execute code within a scope
+mainScope.createWithin {
+    // Dependencies resolved here will use mainScope
+    let repository = ScopedResolver.default.resolve(type: UserRepository.self)
+}
+```
+
 ### Injecting Dependencies
-To inject a registered dependency into your classes, you can use the provided property wrappers: `@Injected` and `@OptionalInjected`
+To inject a registered dependency into your classes, you can use the provided property wrappers: `@Injected`, `@OptionalInjected`, and `@ScopeInjected`
 
 #### @Injected
 Use `@Injected` to inject a required dependency. If the dependency cannot be resolved, it will trigger a fatal error.
@@ -53,12 +84,26 @@ class ProfileViewModel {
     @Injected var repository: UserRepository
 }
 ```
-Use `tag` parameter for injecting tagged dependencies
+Use `tag` parameter for injecting tagged dependencies:
 ```swift
 class ProfileViewModel {
     @Injected(tag: "tag1") var repository: UserRepository
 }
 ```
+
+#### @ScopeInjected
+Use `@ScopeInjected` to inject a dependency from the current scope. The dependency must be resolved within a scope:
+```swift
+class ProfileViewModel {
+    @ScopeInjected var repository: UserRepository
+}
+
+// Usage
+mainScope.createWithin {
+    let viewModel = ProfileViewModel() // repository will be resolved from mainScope
+}
+```
+
 #### @OptionalInjected
 Use `@OptionalInjected` to inject an optional dependency. If the dependency cannot be resolved, the wrapped value will be `nil`
 ```swift 
@@ -66,5 +111,6 @@ class ProfileViewModel {
     @OptionalInjected var repository: UserRepository
 }
 ```
+
 ## Contributing
 If you encounter any issues, have ideas for improvements, or want to contribute to this project, please feel free to create a pull request or raise an issue on GitHub.
